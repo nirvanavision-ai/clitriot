@@ -531,7 +531,7 @@ function vYou(){
       ${[...S.blocked, ...S.muted].length ? `<div class="list">${[...S.blocked].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Blocked</div></div><button class="cta quiet sm" data-act="unblock" data-c="${k}">Unblock</button></div>`).join('')}${[...S.muted].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Muted</div></div><button class="cta quiet sm" data-act="unmute" data-c="${k}">Unmute</button></div>`).join('')}</div>` : `<div class="muted small">No one.</div>`}
     </div>
     <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Prototype views</span><div class="row-cta"><button class="cta quiet" data-role="creator">Creator dashboard</button><button class="cta quiet" data-role="admin">Admin panel</button></div><div class="fine">For demos: see the same purchases from the creator’s and the platform’s side.</div></div>
-    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Legal and support</span>${legalLinks()}</div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Legal and support</span>${legalLinks()}<div class="fine mono">Prototype build 0.2 · Oct 29</div></div>
   </div>`;
 }
 const LEGAL = {terms:'Terms of service', privacy:'Privacy policy', '2257':'18 U.S.C. 2257 statement', billing:'Billing support', report:'Report content or request removal'};

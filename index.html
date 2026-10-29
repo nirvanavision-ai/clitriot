@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Clitriot</title>
+<link rel="icon" type="image/svg+xml" href="brand/clitriot-mark.svg">
+<link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -77,7 +79,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .card{height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden}
 .card .shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,9,12,.92) 0%,rgba(14,9,12,.55) 32%,transparent 58%),linear-gradient(to bottom,rgba(14,9,12,.55),transparent 18%)}
 .feedbar{position:sticky;top:0;height:0;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px 0;pointer-events:none;overflow:visible}
-.feedbar b{font-family:var(--display);font-style:italic;font-weight:500;font-size:22px}
+.feedbar .logo{display:block;height:19px;width:auto;margin-top:6px;filter:drop-shadow(0 1px 6px rgba(0,0,0,.55))}
 .feedbar button{pointer-events:auto}
 .chip-wallet{display:flex;align-items:center;gap:8px;background:rgba(24,17,21,.7);backdrop-filter:blur(8px);border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;font-family:var(--mono);font-size:13px}
 .chip-wallet i{width:6px;height:6px;border-radius:50%;background:var(--brass)}
@@ -193,6 +195,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .gatescreen{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end}
 .gatescreen .inner{position:relative;z-index:2;padding:22px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(to top,var(--ground) 60%,transparent)}
 .gatescreen h1{font-family:var(--display);font-weight:500;font-style:italic;font-size:40px;line-height:1;margin:0}
+.gatescreen h1.logo-h{line-height:0;padding:4px 0 6px}.gatescreen h1.logo-h img{width:min(300px,100%);height:auto}
 .legal-links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px}
 .legal-links button{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .toast{position:absolute;left:14px;right:14px;bottom:76px;z-index:60;background:var(--bone);color:var(--brass-ink);border-radius:14px;padding:12px 14px;font-weight:600;font-size:13px;box-shadow:0 12px 30px -10px rgba(0,0,0,.6);animation:rise .25s ease-out}
@@ -237,7 +240,7 @@ html[data-mode="site"] .device{width:100%;max-width:520px;height:100%;min-height
 @media (min-width:900px){
   html[data-mode="site"] .device{max-width:none;border:0}
   html[data-mode="site"] .nav{order:-1;height:72px;flex:none;border-top:0;border-bottom:1px solid var(--line);padding:0 max(32px,calc((100% - 1256px)/2));gap:4px;justify-content:flex-start;align-items:center;background:var(--ground)}
-  html[data-mode="site"] .nav::before{content:"Clitriot";font-family:var(--display);font-style:italic;font-weight:500;font-size:32px;color:var(--bone);margin-right:28px}
+  html[data-mode="site"] .nav::before{content:"";flex:none;width:240px;height:27px;background:url(brand/clitriot-logo.svg) left center/contain no-repeat;margin-right:32px}
   html[data-mode="site"] .nav button{flex:none;flex-direction:row;padding:9px 16px;border-radius:999px;font-size:15px}
   html[data-mode="site"] .nav button:hover{background:var(--surface);color:var(--bone)}
   html[data-mode="site"] .nav button[aria-current="page"]{background:var(--surface)}
@@ -526,7 +529,7 @@ function feedCard(f, i){
 function vFeed(){
   const blockedCreators = S.blocked;
   const items = FEED.map((f, i) => ({f, i})).filter(({f}) => !blockedCreators.has(f.c ? ITEMS[f.c].creator : SERIES[f.s].creator));
-  return `<div class="feedbar"><b>Clitriot</b><button class="chip-wallet" data-act="go" data-to="wallet" aria-label="Wallet balance"><i></i>${fmt(balance())}</button></div>
+  return `<div class="feedbar"><img class="logo" src="brand/clitriot-logo.svg" alt="Clitriot"><button class="chip-wallet" data-act="go" data-to="wallet" aria-label="Wallet balance"><i></i>${fmt(balance())}</button></div>
     ${items.map(({f, i}) => feedCard(f, i)).join('')}`;
 }
 function vWallet(){
@@ -600,7 +603,7 @@ function vYou(){
       ${[...S.blocked, ...S.muted].length ? `<div class="list">${[...S.blocked].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Blocked</div></div><button class="cta quiet sm" data-act="unblock" data-c="${k}">Unblock</button></div>`).join('')}${[...S.muted].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Muted</div></div><button class="cta quiet sm" data-act="unmute" data-c="${k}">Unmute</button></div>`).join('')}</div>` : `<div class="muted small">No one.</div>`}
     </div>
     <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Prototype views</span><div class="row-cta"><button class="cta quiet" data-role="creator">Creator dashboard</button><button class="cta quiet" data-role="admin">Admin panel</button></div><div class="fine">For demos: see the same purchases from the creator’s and the platform’s side.</div></div>
-    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Legal and support</span>${legalLinks()}<div class="fine mono">Prototype build 0.4 · Oct 29</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Legal and support</span>${legalLinks()}<div class="fine mono">Prototype build 0.5 · Oct 29</div></div>
   </div>`;
 }
 const LEGAL = {terms:'Terms of service', privacy:'Privacy policy', '2257':'18 U.S.C. 2257 statement', billing:'Billing support', report:'Report content or request removal'};
@@ -830,7 +833,7 @@ function gateHtml(){
   const j = JURIS.find(x => x.code === S.region);
   const bg = viz(CREATORS.velvet.pal, 'gate', false);
   if (j.status === 'BLOCK' || j.status === 'PENDING_COUNSEL') return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">${j.name}</span><h1>Not available where you are</h1><div class="muted">Clitriot isn’t offered in your region right now.</div>${legalLinks()}<div class="fine">Demo: change the simulated region in Admin → Regions.</div></div></div>`;
-  if (!S.ageOk) return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">Adults only</span><h1>Clitriot</h1><div>This site contains sexually explicit material. Enter only if you are 18 or older, or the age of majority where you live, and it’s legal for you to view it.</div>
+  if (!S.ageOk) return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">Adults only</span><h1 class="logo-h"><img src="brand/clitriot-logo.svg" alt="Clitriot"></h1><div>This site contains sexually explicit material. Enter only if you are 18 or older, or the age of majority where you live, and it’s legal for you to view it.</div>
     <div class="row-cta"><button class="cta" data-act="enter">I’m 18 or older, enter</button><button class="cta quiet sm" data-act="info" data-title="You’ve left" data-text="In production this sends visitors to a neutral page.">Leave</button></div>${legalLinks()}</div></div>`;
   if (j.status === 'VERIFY' && !S.avOk) return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">${j.name} · age check</span><h1>Confirm your age</h1><div class="muted">Local law asks us to verify your age before you browse. A verification provider checks it; we only keep a pass token, never your documents.</div><button class="cta" data-act="av">Verify with provider (simulated)</button>${legalLinks()}</div></div>`;
   return '';

@@ -21,6 +21,18 @@ Cloudflare is free at this size. Its terms allow lawful adult sites, and it can 
 
 To update the site later, upload the new `site/` contents to the same Pages project.
 
+## clitriot.com is registered at Hostinger
+
+Use the recommended route above. For step 3, on Hostinger:
+
+1. Sign in to hPanel and open **Domains → clitriot.com**.
+2. Open **DNS / Nameservers**, choose **Change nameservers**, then **Change nameservers manually** (not Hostinger's own).
+3. Paste the two Cloudflare nameservers and save.
+
+Before you switch, check Cloudflare's imported record list against Hostinger's DNS zone. If you use Hostinger email on this domain, its MX and TXT records must be in Cloudflare too, or email stops.
+
+Hostinger's own DNS can't point the bare domain at Cloudflare Pages, which has no fixed IP address. That's why moving the nameservers is simpler than adding records at Hostinger.
+
 ## If the domain should stay at your registrar's DNS
 
 Do steps 1 and 4 only. Then, at your registrar, add:

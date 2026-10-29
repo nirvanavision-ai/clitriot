@@ -8,3 +8,7 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   Header set Referrer-Policy "no-referrer"
   Header set X-Content-Type-Options "nosniff"
 </IfModule>
+
+# Repo files that shouldn't be served (Hostinger deploys the whole repo)
+RedirectMatch 404 /\.git
+RedirectMatch 404 ^/(README\.md|docs/.*)$

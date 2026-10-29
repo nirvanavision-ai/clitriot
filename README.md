@@ -14,14 +14,12 @@ Clickable prototype of Clitriot, a mobile-first vertical video platform for the 
 
 | Path | What it is |
 |---|---|
-| `site/index.html` | The whole prototype in one self-contained file |
-| `site/robots.txt`, `site/_headers` | Keep it out of search engines and label it as adult |
-| `DEPLOY.md` | How to serve `site/` at clitriot.com with Cloudflare Pages |
+| `index.html` | The whole prototype in one self-contained file (served at clitriot.com) |
+| `robots.txt`, `.htaccess`, `_headers` | Keep it out of search engines, force HTTPS, label it as adult |
+| `docs/DEPLOY.md` | How pushes to `main` auto-deploy to Hostinger |
 
 ## Run locally
 
-Open `site/index.html` in a browser, or serve the folder:
+Open `index.html` in a browser, or run `npx serve .`
 
-```sh
-npx serve site
-```
+Pushes to `main` deploy to clitriot.com automatically (see `docs/DEPLOY.md`).

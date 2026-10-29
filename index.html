@@ -1,11 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-mode="site">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="rating" content="adult">
-<title>Clitriot prototype</title>
+<meta name="theme-color" content="#110c0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Clitriot</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -219,6 +222,15 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .avatars{display:flex;gap:10px}
 .avatars button{width:44px;height:44px;border-radius:50%;border:2px solid transparent}
 .avatars button[aria-pressed="true"]{border-color:var(--brass)}
+/* site mode: the deployed website, no phone frame or notes */
+html[data-mode="site"] body{padding:0;background:var(--stage)}
+html[data-mode="site"] .stage{display:block;padding:0;max-width:none;height:100%}
+html[data-mode="site"] .notes,html[data-mode="site"] .mobile-roles{display:none}
+html[data-mode="site"] .device-wrap{height:100%;display:block}
+html[data-mode="site"] .device{width:100%;max-width:520px;height:100%;min-height:0;margin:0 auto;border:0;border-radius:0;box-shadow:none;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+@media (max-width:520px){html[data-mode="site"] .device{border-left:0;border-right:0}}
+.demobar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 14px;background:var(--brass);color:var(--brass-ink);font-size:12px;font-weight:700;flex:none}
+.demobar button{text-decoration:underline;text-underline-offset:3px}
 /* mobile */
 .mobile-roles{display:none}
 @media (max-width:820px){
@@ -518,6 +530,7 @@ function vYou(){
     <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Blocked and muted</span>
       ${[...S.blocked, ...S.muted].length ? `<div class="list">${[...S.blocked].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Blocked</div></div><button class="cta quiet sm" data-act="unblock" data-c="${k}">Unblock</button></div>`).join('')}${[...S.muted].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Muted</div></div><button class="cta quiet sm" data-act="unmute" data-c="${k}">Unmute</button></div>`).join('')}</div>` : `<div class="muted small">No one.</div>`}
     </div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Prototype views</span><div class="row-cta"><button class="cta quiet" data-role="creator">Creator dashboard</button><button class="cta quiet" data-role="admin">Admin panel</button></div><div class="fine">For demos: see the same purchases from the creator’s and the platform’s side.</div></div>
     <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Legal and support</span>${legalLinks()}</div>
   </div>`;
 }
@@ -746,7 +759,9 @@ function render(resetScroll){
   else body = {splits:aSplits, pricing:aPricing, regions:aRegions}[sc]();
   const navKey = sc === 'thread' ? 'inbox' : sc === 'profile' ? S.prev : sc;
   const nav = NAV[v].map(([k, l]) => `<button data-act="go" data-to="${k}" ${navKey === k ? 'aria-current="page"' : ''}>${k === 'inbox' && S.unread.size ? '<span class="badge"></span>' : ''}${l}</button>`).join('');
-  app.innerHTML = `<div class="screen ${cls}">${body}</div>${foot}<nav class="nav">${nav}</nav>${S.player && v === 'viewer' ? playerHtml() : ''}${sheetHtml()}${gateHtml()}${S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ''}`;
+  const siteMode = document.documentElement.dataset.mode === 'site';
+  const demobar = siteMode && v !== 'viewer' ? `<div class="demobar"><span>Prototype view: ${v === 'creator' ? 'Creator dashboard' : 'Admin panel'}</span><button data-role="viewer">Back to the app</button></div>` : '';
+  app.innerHTML = `${demobar}<div class="screen ${cls}">${body}</div>${foot}<nav class="nav">${nav}</nav>${S.player && v === 'viewer' ? playerHtml() : ''}${sheetHtml()}${gateHtml()}${S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ''}`;
   lastSheet = S.sheet; lastPlayer = !!(S.player && v === 'viewer');
   const scr = app.querySelector('.screen'); scr.scrollTop = keep;
   if (cls === 'feed') observeFeed(scr);

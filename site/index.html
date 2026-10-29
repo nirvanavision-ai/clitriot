@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="rating" content="adult">
+<title>Clitriot prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: annotated phone on a velvet stage. Notes panel left on desktop, below the device on phones. Single dark look by choice. */
+:root{
+  --stage:#110c0f; --ground:#181115; --surface:#211820; --raised:#2c2129; --line:rgba(239,228,216,.12); --line-strong:rgba(239,228,216,.22);
+  --bone:#efe4d8; --muted:#a8968f; --faint:#776760;
+  --brass:#d3ad72; --brass-soft:rgba(211,173,114,.14); --brass-ink:#21170f;
+  --ok:#95bb9e; --warn:#e2aa61; --bad:#de8072; --info:#9fb2cf;
+  --display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --body:"Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--stage);color:var(--bone);font-family:var(--body);font-size:14px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.stage{display:grid;grid-template-columns:minmax(0,380px) auto;gap:48px;justify-content:center;align-items:start;padding-block:28px;max-width:1100px;margin:0 auto}
+/* notes */
+.notes{position:sticky;top:28px;display:flex;flex-direction:column;gap:22px;min-width:0}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font-family:var(--display);font-style:italic;font-weight:500;font-size:34px;letter-spacing:-.01em}
+.brand span{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.lede{color:var(--muted);max-width:52ch;margin:0}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line-strong);border-radius:999px;padding:3px}
+.roles button{padding:8px 0;border-radius:999px;font-weight:600;font-size:13px;color:var(--muted)}
+.roles button[aria-pressed="true"]{background:var(--brass);color:var(--brass-ink)}
+.note-card{border-top:1px solid var(--line-strong);padding-top:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.note-card h3{font-family:var(--display);font-weight:500;font-size:22px;margin:0;text-wrap:balance}
+.note-card ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px;color:var(--bone)}
+.note-card li::marker{color:var(--brass)}
+.note-card .try{background:var(--brass-soft);border-radius:10px;padding:10px 12px;color:var(--bone);font-size:13px}
+.note-foot{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--faint)}
+.note-foot button{text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
+/* device */
+.device{width:390px;max-width:100%;height:min(844px,calc(100dvh - 56px));min-height:600px;border-radius:46px;border:10px solid #070506;box-shadow:0 0 0 1px var(--line),0 40px 80px -30px rgba(0,0,0,.7);overflow:hidden;position:relative;background:var(--ground)}
+.app{position:absolute;inset:0;display:flex;flex-direction:column}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.pad{padding:18px 18px 28px;display:flex;flex-direction:column;gap:18px}
+.nav{display:flex;border-top:1px solid var(--line);background:var(--ground);height:62px;flex:none}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;color:var(--faint);position:relative}
+.nav button[aria-current="page"]{color:var(--bone)}
+.nav button[aria-current="page"]::before{content:"";width:18px;height:2px;border-radius:2px;background:var(--brass);position:absolute;top:10px}
+.nav .badge{position:absolute;top:12px;right:calc(50% - 22px);width:7px;height:7px;border-radius:50%;background:var(--brass)}
+/* headings */
+.h-screen{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.h-screen h1{font-family:var(--display);font-style:italic;font-weight:500;font-size:30px;margin:0;letter-spacing:-.01em}
+.back{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.section-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .faint{color:var(--faint)} .small{font-size:12px}
+/* placeholder visual */
+.viz{position:absolute;inset:0;overflow:hidden;background:var(--v0)}
+.viz::before{content:"";position:absolute;inset:-30%;background:radial-gradient(40% 35% at 30% 30%,var(--v1),transparent 70%),radial-gradient(45% 40% at 72% 62%,var(--v2),transparent 70%),radial-gradient(30% 30% at 40% 85%,var(--v3),transparent 70%);filter:blur(18px);animation:drift 18s ease-in-out infinite alternate}
+.viz::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");mix-blend-mode:overlay;opacity:.5}
+.viz .ph{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(239,228,216,.45);text-align:center;z-index:1;white-space:nowrap}
+@keyframes drift{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(4%,-3%) rotate(8deg)}100%{transform:translate(-3%,4%) rotate(-6deg)}}
+/* feed */
+.screen.feed{scroll-snap-type:y mandatory}
+.card{height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden}
+.card .shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,9,12,.92) 0%,rgba(14,9,12,.55) 32%,transparent 58%),linear-gradient(to bottom,rgba(14,9,12,.55),transparent 18%)}
+.feedbar{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:16px 18px;pointer-events:none}
+.feedbar b{font-family:var(--display);font-style:italic;font-weight:500;font-size:22px}
+.feedbar button{pointer-events:auto}
+.chip-wallet{display:flex;align-items:center;gap:8px;background:rgba(24,17,21,.7);backdrop-filter:blur(8px);border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;font-family:var(--mono);font-size:13px}
+.chip-wallet i{width:6px;height:6px;border-radius:50%;background:var(--brass)}
+.prog{position:absolute;left:18px;right:18px;top:62px;height:2px;background:rgba(239,228,216,.18);border-radius:2px;z-index:3;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--bone)}
+.card.live .prog i{animation:fill var(--pd,6s) linear forwards}
+.card.live[data-owned="true"] .prog i{animation:fill 22s linear infinite}
+@keyframes fill{to{width:100%}}
+.state-chip{position:absolute;top:74px;left:18px;z-index:3;font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:4px 9px;border-radius:999px;background:rgba(24,17,21,.65);border:1px solid var(--line-strong)}
+.ended{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;background:rgba(18,12,15,.55);backdrop-filter:blur(14px);opacity:0;pointer-events:none;transition:opacity .5s}
+.ended b{font-family:var(--display);font-style:italic;font-weight:500;font-size:24px}
+.card.ended-on .ended{opacity:1}
+.info{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:0 18px 18px;display:flex;flex-direction:column;gap:10px}
+.who{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;align-self:flex-start}
+.av{width:30px;height:30px;border-radius:50%;flex:none;border:1px solid var(--line-strong)}
+.av.lg{width:72px;height:72px}
+.info h2{font-family:var(--display);font-weight:500;font-style:italic;font-size:28px;line-height:1.08;margin:0;text-wrap:balance}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:600;letter-spacing:.02em;padding:3px 8px;border-radius:999px;border:1px solid var(--line-strong);color:var(--bone);background:rgba(24,17,21,.45)}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.series-badge{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);border:1px solid rgba(211,173,114,.45);padding:3px 8px;border-radius:4px}
+.row-cta{display:flex;gap:8px}
+.cta{flex:1;display:flex;justify-content:center;align-items:center;gap:8px;height:48px;border-radius:14px;background:var(--brass);color:var(--brass-ink);font-weight:700;font-size:15px}
+.cta .mono{font-weight:500}
+.cta.ghost{background:rgba(239,228,216,.08);color:var(--bone);border:1px solid var(--line-strong)}
+.cta.quiet{background:transparent;color:var(--bone);border:1px solid var(--line-strong)}
+.cta:disabled{opacity:.5;cursor:default}
+.cta.sm{height:38px;font-size:13px;border-radius:11px;flex:none;padding:0 14px}
+/* lists */
+.list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);min-width:0}
+.li .grow{flex:1;min-width:0}
+.li .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .s{font-size:12px;color:var(--muted)}
+.amt{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.amt.neg{color:var(--bone)} .amt.pos{color:var(--ok)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.big{font-family:var(--mono);font-size:40px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.kpi .v{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.03em;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok);background:rgba(149,187,158,.12)} .pill.warn{color:var(--warn);background:rgba(226,170,97,.12)} .pill.bad{color:var(--bad);background:rgba(222,128,114,.12)} .pill.info{color:var(--info);background:rgba(159,178,207,.12)} .pill.brass{color:var(--brass);background:var(--brass-soft)}
+.lotbar{height:4px;border-radius:4px;background:var(--raised);overflow:hidden;margin-top:6px}
+.lotbar i{display:block;height:100%;background:var(--brass)}
+.draws{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.empty{padding:28px 8px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:8px;align-items:center}
+.empty b{font-family:var(--display);font-style:italic;font-weight:500;font-size:20px;color:var(--bone)}
+/* profile */
+.prof-head{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.prof-head h1{font-family:var(--display);font-style:italic;font-weight:500;font-size:32px;margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.tile{position:relative;aspect-ratio:9/16;border-radius:8px;overflow:hidden;max-width:100%;text-align:left}
+.tile .lbl{position:absolute;left:6px;right:6px;bottom:6px;z-index:2;font-size:11px;font-weight:600;line-height:1.2}
+.tile .pr{position:absolute;top:6px;right:6px;z-index:2;font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:999px;background:rgba(14,9,12,.7)}
+.tile .viz .ph{display:none}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(14,9,12,.8),transparent 55%);z-index:1}
+/* messages */
+.thread{display:flex;flex-direction:column;gap:10px;padding:16px 18px}
+.bub{max-width:80%;padding:10px 13px;border-radius:16px;background:var(--surface);border:1px solid var(--line);align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere}
+.bub.me{align-self:flex-end;background:var(--raised);border-color:var(--line-strong)}
+.bub .when{display:block;font-size:10px;color:var(--faint);margin-top:4px;font-family:var(--mono)}
+.ppv{align-self:flex-start;width:78%;border-radius:16px;overflow:hidden;border:1px solid rgba(211,173,114,.4);background:var(--surface)}
+.ppv .vis{position:relative;height:150px}
+.ppv .body{padding:12px;display:flex;flex-direction:column;gap:8px}
+.composer{border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:8px;align-items:center;background:var(--ground)}
+.composer input{flex:1;min-width:0;height:42px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--bone);padding:0 12px;font:inherit}
+.gate{border-top:1px solid var(--line);padding:14px 18px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.meter{height:6px;border-radius:6px;background:var(--raised);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--brass)}
+/* overlays */
+.scrim{position:absolute;inset:0;background:rgba(8,5,7,.6);z-index:40;display:flex;align-items:flex-end}
+.scrim.anim{animation:fade .2s}
+.sheet{width:100%;max-height:88%;overflow-y:auto;background:var(--surface);border-top:1px solid var(--line-strong);border-radius:22px 22px 0 0;padding:10px 18px 22px;display:flex;flex-direction:column;gap:14px}
+.scrim.anim .sheet{animation:rise .25s ease-out}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line-strong);align-self:center}
+.sheet h2{font-family:var(--display);font-weight:500;font-style:italic;font-size:26px;margin:0;text-wrap:balance}
+.sheet ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+@keyframes rise{from{transform:translateY(30px);opacity:0}}
+@keyframes fade{from{opacity:0}}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1px solid var(--line-strong);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.opt .v{font-family:var(--mono);font-size:20px}
+.opt .l{font-size:11px;color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--brass);background:var(--brass-soft)}
+.opt:disabled{opacity:.35;cursor:default}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.kv span:last-child{font-family:var(--mono)}
+.fine{font-size:11.5px;color:var(--faint);line-height:1.5}
+/* player */
+.player{position:absolute;inset:0;z-index:30;background:var(--ground);display:flex;flex-direction:column}
+.player.anim{animation:fade .25s}
+.player .stagev{position:relative;flex:1;min-height:0}
+.player .top{position:absolute;top:0;left:0;right:0;z-index:5;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}
+.player .close{width:36px;height:36px;border-radius:50%;background:rgba(14,9,12,.6);border:1px solid var(--line-strong);font-size:18px;line-height:1}
+.trail{display:flex;gap:4px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.trail i{width:16px;height:1px;background:var(--line-strong)}
+.trail span{padding:2px 6px;border:1px solid var(--line-strong);border-radius:4px}
+.trail span.cur{border-color:var(--brass);color:var(--brass)}
+.choice{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;padding:18px;background:linear-gradient(to top,rgba(14,9,12,.96) 30%,rgba(14,9,12,.5))}
+.choice h3{font-family:var(--display);font-style:italic;font-weight:500;font-size:30px;margin:0 0 4px}
+.door{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line-strong);background:rgba(33,24,32,.85)}
+.door .dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.door .dn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.door .dt{font-family:var(--display);font-size:22px;font-style:italic}
+.door .own{color:var(--ok);font-size:12px;font-weight:600}
+.pctrl{padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);background:var(--ground)}
+.pctrl h2{font-family:var(--display);font-style:italic;font-weight:500;font-size:24px;margin:0}
+/* gates */
+.gatescreen{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end}
+.gatescreen .inner{position:relative;z-index:2;padding:22px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(to top,var(--ground) 60%,transparent)}
+.gatescreen h1{font-family:var(--display);font-weight:500;font-style:italic;font-size:40px;line-height:1;margin:0}
+.legal-links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px}
+.legal-links button{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.toast{position:absolute;left:14px;right:14px;bottom:76px;z-index:60;background:var(--bone);color:var(--brass-ink);border-radius:14px;padding:12px 14px;font-weight:600;font-size:13px;box-shadow:0 12px 30px -10px rgba(0,0,0,.6);animation:rise .25s ease-out}
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.new td{background:var(--brass-soft)}
+.bar{display:flex;flex-direction:column;gap:5px}
+.bar .bt{display:flex;justify-content:space-between;font-size:13px}
+.bar .track{height:8px;border-radius:8px;background:var(--raised);overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--brass);border-radius:8px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.check .mk{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700}
+.mk.ok{background:rgba(149,187,158,.18);color:var(--ok)} .mk.warn{background:rgba(226,170,97,.18);color:var(--warn)} .mk.info{background:rgba(159,178,207,.16);color:var(--info)}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line-strong);font-size:16px}
+.stepper .v{font-family:var(--mono);min-width:44px;text-align:center}
+.toggle{width:44px;height:26px;border-radius:999px;background:var(--raised);border:1px solid var(--line-strong);position:relative;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:transform .2s}
+.toggle[aria-checked="true"]{background:var(--brass)}
+.toggle[aria-checked="true"]::after{transform:translateX(18px);background:var(--brass-ink)}
+input[type=range]{width:100%;accent-color:var(--brass)}
+.radio-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.radio-row .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line-strong);flex:none}
+.radio-row[aria-checked="true"] .dot{border-color:var(--brass);background:radial-gradient(var(--brass) 45%,transparent 50%)}
+.avatars{display:flex;gap:10px}
+.avatars button{width:44px;height:44px;border-radius:50%;border:2px solid transparent}
+.avatars button[aria-pressed="true"]{border-color:var(--brass)}
+/* mobile */
+.mobile-roles{display:none}
+@media (max-width:820px){
+  .stage{grid-template-columns:1fr;gap:20px;padding-block:14px}
+  .notes{position:static;order:2}
+  .device-wrap{order:1;display:flex;justify-content:center}
+  .device{width:100%;max-width:430px;height:calc(100dvh - 120px);min-height:560px;border-radius:28px;border-width:6px}
+  .mobile-roles{display:block}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="stage">
+  <aside class="notes" id="notes"></aside>
+  <div class="device-wrap">
+    <div class="mobile-roles" id="mroles"></div>
+    <div class="device"><div class="app" id="app"></div></div>
+  </div>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const fmt = c => (c < 0 ? '−$' : '$') + (Math.abs(c) / 100).toFixed(2);
+const pct = bps => (bps / 100).toFixed(bps % 100 ? 1 : 0) + '%';
+const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const TODAY = new Date(2026, 9, 28, 19, 40);
+const addDays = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return d; };
+const dstr = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+const tstr = d => d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+const nowStamp = () => { const d = new Date(TODAY); d.setMinutes(d.getMinutes() + (S ? S.tick++ : 0)); return d; };
+
+/* ---------- catalogue (placeholder data) ---------- */
+const CREATORS = {
+  velvet:{name:'Velvet Hours', handle:'velvethours', tier:'Trusted', pal:['#3a1824','#8c3a4f','#c9875d','#4d2a52'], bio:'Slow, cinematic solo work. A new series every other Friday.'},
+  marlowe:{name:'Marlowe Kade', handle:'marlowekade', tier:'Established', pal:['#14202a','#2f5866','#b7774f','#22354a'], bio:'Night-shift energy. POV and slow tease.'},
+  juno:{name:'Juno Lark', handle:'junolark', tier:'New', pal:['#221a2e','#6a4e8c','#d7a6a0','#3b2f57'], bio:'Whisper sets, stockings, Sunday mornings.'},
+  sable:{name:'Sable Wren', handle:'sablewren', tier:'Established', pal:['#121c1c','#2d5a55','#a39065','#1f3b3d'], bio:'Seven Nights is my first series. One new night every week.'},
+  oriel:{name:'Oriel Vance', handle:'orielvance', tier:'Premium', pal:['#24180c','#8a6131','#d9b27a','#5a2a24'], bio:'Commissions and long private sets for collectors.'}
+};
+const ITEMS = {
+  c1:{creator:'marlowe', title:'Late shift, slow tease', tags:['solo','POV','tease'], price:99, dur:'1:12'},
+  c2:{creator:'juno', title:'Sunday stockings', tags:['solo','lingerie'], price:149, dur:'0:58'},
+  c3:{creator:'oriel', title:'The gold room, private set', tags:['solo','roleplay','long-form'], price:2499, dur:'6:40'},
+  c4:{creator:'velvet', title:'Oil & candlelight', tags:['solo','oil','feet'], price:199, dur:'1:30'},
+  c5:{creator:'juno', title:'Whisper set no. 4', tags:['solo','ASMR'], price:99, dur:'2:05'},
+  c6:{creator:'marlowe', title:'Mirror, mirror', tags:['solo','tease'], price:249, dur:'1:44'},
+  c7:{creator:'sable', title:'Before the first night', tags:['solo','tease'], price:99, dur:'0:49'},
+  c8:{creator:'oriel', title:'Velvet gloves', tags:['solo','lingerie'], price:499, dur:'1:20'},
+  u1:{creator:'velvet', title:'Rain on the window', tags:['solo','ASMR'], price:600, dur:'2:30', unlisted:true}
+};
+const SERIES = {
+  hotel:{creator:'velvet', title:'The Hotel Key', mode:'branching', entry:'h1', blurb:'You pick which door she opens. Every path is a different night.', nodes:{
+    h1:{title:'Check-in', price:0, tags:['solo'], next:'h2', dur:'0:55'},
+    h2:{title:'The elevator', price:0, tags:['solo','tease'], dur:'0:48', doors:[
+      {label:'The bath', reveal:'LABELED', tags:['solo','oil'], to:'h3a'},
+      {label:'The balcony', reveal:'TEASED', tags:['solo','feet','outdoor'], to:'h3b'},
+      {label:'Room 1412', reveal:'BLIND', tags:['solo','lingerie'], to:'h3c'}]},
+    h3a:{title:'The bath', price:99, tags:['solo','oil'], dur:'1:20', doors:[
+      {label:'Stay in', reveal:'LABELED', tags:['solo','ASMR'], to:'h4a'},
+      {label:'Room service', reveal:'TEASED', tags:['solo','roleplay'], to:'h4b'}]},
+    h3b:{title:'The balcony', price:99, tags:['solo','feet','outdoor'], dur:'1:05', next:'h4c'},
+    h3c:{title:'Room 1412', price:99, tags:['solo','lingerie'], dur:'1:15', next:'h4b'},
+    h4a:{title:'Late checkout', price:99, tags:['solo','ASMR'], dur:'1:40', ending:true},
+    h4b:{title:'Do not disturb', price:99, tags:['solo','roleplay'], dur:'1:35', ending:true},
+    h4c:{title:'City lights', price:99, tags:['solo','feet'], dur:'1:10', ending:true}
+  }},
+  nights:{creator:'sable', title:'Seven Nights', mode:'linear', entry:'n1', blurb:'One night a week, in order. Five of seven nights are out now.', nodes:{
+    n1:{title:'Night one', price:0, tags:['solo'], next:'n2', dur:'0:50'},
+    n2:{title:'Night two', price:99, tags:['solo','tease'], next:'n3', dur:'1:05'},
+    n3:{title:'Night three', price:99, tags:['solo','lingerie'], next:'n4', dur:'1:10'},
+    n4:{title:'Night four', price:99, tags:['solo','ASMR'], next:'n5', dur:'1:02'},
+    n5:{title:'Night five', price:99, tags:['solo','tease'], dur:'1:15', ending:true, cont:true}
+  }}
+};
+for (const [sid, s] of Object.entries(SERIES)) for (const [k, n] of Object.entries(s.nodes)) ITEMS[sid + ':' + k] = {creator:s.creator, title:n.title, tags:n.tags, price:n.price, dur:n.dur, series:sid, node:k};
+const bundlePrice = sid => { const sum = Object.values(SERIES[sid].nodes).reduce((a, n) => a + n.price, 0); return Math.floor(sum * 0.8 / 5) * 5; };
+const FEED = [{s:'hotel'},{c:'c1'},{c:'c2'},{s:'nights'},{c:'c3'},{c:'c4'},{c:'c5'},{c:'c6'},{c:'c8'},{c:'c7'}];
+
+const JURIS = [
+  {code:'US-OR', name:'Oregon', status:'OPEN'},
+  {code:'US-CA', name:'California', status:'OPEN'},
+  {code:'US-LA', name:'Louisiana', status:'VERIFY'},
+  {code:'US-TX', name:'Texas', status:'BLOCK'},
+  {code:'US-UT', name:'Utah', status:'BLOCK'},
+  {code:'US-FL', name:'Florida', status:'BLOCK'},
+  {code:'ZZ', name:'Anywhere without a row', status:'PENDING_COUNSEL'}
+];
+
+/* ---------- state ---------- */
+let S, pending = null, toastTimer = null;
+function freshState(){
+  return {
+    role:'viewer', screen:'feed', prev:'feed', tick:0,
+    ageOk:false, avOk:false, region:'US-OR',
+    me:'nightowl_92', avatar:0,
+    lots:[], ledger:[], owned:new Set(), spent:{}, firstDeposit:true,
+    blocked:new Set(), muted:new Set(),
+    threads:{support:[{from:'admin', text:'Welcome to Clitriot. Your wallet, library and messages live here. Creators can see your screen name and what you buy from them. They never see your name, email or card.', when:addDays(0)}]},
+    unread:new Set(['support']),
+    profile:null, thread:null, sheet:null, player:null, toast:null,
+    creatorCfg:{velvet:{min:500, off:false}, marlowe:{min:500, off:false}, juno:{min:99, off:false}, sable:{min:500, off:false}, oriel:{min:2500, off:false}},
+    creatorBlocks:[{who:'persistent_guy', when:'Oct 3'}],
+    cfg:[
+      {id:47, scope:'global', product:'Unlock', bps:8000, eff:new Date(2026,6,1), by:'ANGIE', reason:'Launch default', status:'active'},
+      {id:48, scope:'global', product:'Bundle', bps:8000, eff:new Date(2026,6,1), by:'ANGIE', reason:'Launch default', status:'active'},
+      {id:49, scope:'global', product:'PPV message', bps:8000, eff:new Date(2026,6,1), by:'ANGIE', reason:'Launch default', status:'active'},
+      {id:50, scope:'global', product:'Tip', bps:8000, eff:new Date(2026,6,1), by:'ANGIE', reason:'Launch default', status:'active'},
+      {id:112, scope:'creator', creator:'velvet', product:'Unlock', bps:8500, eff:new Date(2026,9,20), by:'Marketing (offer: Enhanced)', reason:'Recruited rate', disclosed:'Oct 13', status:'active'}
+    ],
+    nextCfg:113, draft:null,
+    sales:[
+      {when:addDays(-1), who:'harborlight', creator:'velvet', item:'Oil & candlelight', type:'Unlock', price:199, bps:8500, cfg:112},
+      {when:addDays(-2), who:'quietstorm_', creator:'velvet', item:'The Hotel Key · bundle of 8 scenes', type:'Bundle', price:475, bps:8000, cfg:48},
+      {when:addDays(-3), who:'harborlight', creator:'velvet', item:'Rain on the window (message)', type:'PPV message', price:600, bps:8000, cfg:49},
+      {when:addDays(-4), who:'p.lindqvist', creator:'velvet', item:'The bath', type:'Unlock', price:99, bps:8500, cfg:112},
+      {when:addDays(-5), who:'quietstorm_', creator:'velvet', item:'Late checkout', type:'Unlock', price:99, bps:8500, cfg:112},
+      {when:addDays(-9), who:'m.r.ellis', creator:'velvet', item:'Room 1412', type:'Unlock', price:99, bps:8000, cfg:47},
+      {when:addDays(-10), who:'m.r.ellis', creator:'velvet', item:'Do not disturb', type:'Unlock', price:99, bps:8000, cfg:47},
+      {when:addDays(-12), who:'harborlight', creator:'velvet', item:'Oil & candlelight', type:'Unlock', price:199, bps:8000, cfg:47},
+      {when:addDays(-1), who:'driftwood', creator:'marlowe', item:'Mirror, mirror', type:'Unlock', price:249, bps:8000, cfg:47},
+      {when:addDays(-2), who:'kestrel.k', creator:'oriel', item:'The gold room, private set', type:'Unlock', price:2499, bps:8000, cfg:47}
+    ],
+    paidOut:{velvet:{amt:1418, when:'Oct 21'}}
+  };
+}
+S = freshState();
+
+const balance = () => S.lots.reduce((a, l) => a + l.rem, 0);
+function resolveSplit(creator, product){
+  const active = r => r.status === 'active' && r.eff <= TODAY;
+  const o = S.cfg.filter(r => r.scope === 'creator' && r.creator === creator && r.product === product && active(r)).sort((a, b) => b.eff - a.eff || b.id - a.id)[0];
+  if (o) return o;
+  return S.cfg.filter(r => r.scope === 'global' && r.product === product && active(r)).sort((a, b) => b.eff - a.eff || b.id - a.id)[0];
+}
+
+/* ---------- purchases ---------- */
+function purchase(p){
+  if (p.grant.every(g => S.owned.has(g))) { closeSheet(); p.after && p.after(); render(); return; }
+  if (balance() < p.price) { pending = () => purchase(p); openSheet({type:'topup', need:p.price - balance(), title:p.title}); return; }
+  if (p.price >= 2000 && !p.confirmed) { openSheet({type:'confirm', p}); return; }
+  let left = p.price; const draws = [];
+  for (const lot of S.lots) { if (!left) break; const take = Math.min(lot.rem, left); if (take) { lot.rem -= take; left -= take; draws.push(lot.id + ' ' + fmt(take)); } }
+  p.grant.forEach(g => S.owned.add(g));
+  S.spent[p.creator] = (S.spent[p.creator] || 0) + p.price;
+  const sp = resolveSplit(p.creator, p.type);
+  S.ledger.unshift({kind:p.type, label:p.title, creator:p.creator, amt:-p.price, draws, when:nowStamp(), snapshot:p.snapshot});
+  S.sales.unshift({when:nowStamp(), who:S.me, creator:p.creator, item:p.title, type:p.type, price:p.price, bps:sp.bps, cfg:sp.id, fresh:true});
+  closeSheet();
+  showToast(`Unlocked ${p.title}. ${fmt(balance())} left in your wallet.`);
+  if (p.creator === 'velvet' && !S.threads.velvet) setTimeout(velvetHello, 1800);
+  p.after && p.after();
+  render();
+}
+function unlockItem(id, after){
+  const it = ITEMS[id];
+  purchase({grant:[id], price:it.price, title:it.title, creator:it.creator, type:it.unlisted ? 'PPV message' : 'Unlock', after});
+}
+function buyBundle(sid){
+  const s = SERIES[sid], ids = Object.keys(s.nodes).map(k => sid + ':' + k).filter(id => ITEMS[id].price > 0);
+  purchase({grant:ids, price:bundlePrice(sid), title:`${s.title} · all ${Object.keys(s.nodes).length} scenes available now`, creator:s.creator, type:'Bundle', snapshot:ids.length, after:() => openSheet({type:'series', id:sid})});
+}
+function velvetHello(){
+  S.threads.velvet = [
+    {from:'c', text:'Thank you for unlocking that one. I shot something quieter last week that isn’t on my page. It’s yours if you want it.', when:nowStamp()},
+    {from:'c', ppv:'u1', when:nowStamp()}
+  ];
+  S.unread.add('velvet');
+  showToast('New message from Velvet Hours');
+  render();
+}
+function deposit(amount){
+  const id = 'D-' + (1040 + S.lots.length + 1);
+  S.lots.push({id, amt:amount, rem:amount, when:nowStamp(), method:'Card ending 4242'});
+  S.ledger.unshift({kind:'Deposit', label:'Wallet deposit ' + id, amt:amount, when:nowStamp(), draws:[]});
+  S.firstDeposit = false;
+  const next = pending; pending = null; S.sheet = null;
+  if (next) next(); else { showToast(`Added ${fmt(amount)} to your wallet.`); render(); }
+}
+
+/* ---------- UI plumbing ---------- */
+function openSheet(sh){ S.sheet = sh; render(); }
+function closeSheet(){ S.sheet = null; }
+function showToast(t){ S.toast = t; clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; render(); }, 3200); }
+function go(screen){ S.prev = S.screen; S.screen = screen; S.sheet = null; render(true); }
+function setRole(r){ S.role = r; S.screen = {viewer:'feed', creator:'earnings', admin:'splits'}[r]; S.sheet = null; S.player = null; render(true); }
+
+const vizStyle = (pal, seed='') => { const r = [...seed].reduce((a, ch) => a + ch.charCodeAt(0), 0) % 4; const p = [...pal.slice(r), ...pal.slice(0, r)]; return `--v0:${pal[0]};--v1:${p[1]};--v2:${p[2]};--v3:${p[3]}`; };
+const viz = (pal, seed, label=true) => `<div class="viz" style="${vizStyle(pal, seed)}">${label ? '<div class="ph">Placeholder · vertical video</div>' : ''}</div>`;
+const avatar = (c, cls='') => `<span class="av ${cls}" style="background:radial-gradient(circle at 30% 30%,${c.pal[2]},${c.pal[1]} 55%,${c.pal[0]})" aria-hidden="true"></span>`;
+const tagsHtml = t => `<div class="tags">${t.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</div>`;
+
+/* ---------- viewer screens ---------- */
+function feedCard(f, i){
+  if (f.c) {
+    const it = ITEMS[f.c], c = CREATORS[it.creator], owned = S.owned.has(f.c);
+    return `<section class="card" data-i="${i}" data-owned="${owned}">
+      ${viz(c.pal, f.c)}<div class="shade"></div>
+      <div class="prog"><i></i></div>
+      <div class="state-chip">${owned ? 'Owned · full ' + it.dur : 'Free preview · 0:06 of ' + it.dur}</div>
+      <div class="ended"><b>Preview ended</b><span class="muted">The full ${it.dur} is ${fmt(it.price)}</span></div>
+      <div class="info">
+        <button class="who" data-act="profile" data-c="${it.creator}">${avatar(c)}<span>${c.name}</span></button>
+        <h2>${esc(it.title)}</h2>
+        ${tagsHtml(it.tags)}
+        <div class="row-cta">${owned ? `<button class="cta ghost" disabled>In your library</button>` : `<button class="cta" data-act="unlock" data-id="${f.c}">Unlock full clip <span class="mono">${fmt(it.price)}</span></button>`}</div>
+      </div></section>`;
+  }
+  const s = SERIES[f.s], c = CREATORS[s.creator], n = Object.keys(s.nodes).length, free = Object.values(s.nodes).filter(x => !x.price).length;
+  return `<section class="card" data-i="${i}" data-owned="true" data-series="1">
+    ${viz(c.pal, f.s)}<div class="shade"></div>
+    <div class="prog"><i></i></div>
+    <div class="state-chip">${s.mode === 'branching' ? 'Branching series · you choose' : 'Series · ' + n + ' episodes out'}</div>
+    <div class="info">
+      <button class="who" data-act="profile" data-c="${s.creator}">${avatar(c)}<span>${c.name}</span></button>
+      <span class="series-badge" style="align-self:flex-start">${s.mode === 'branching' ? 'Choose your path' : 'Watch in order'}</span>
+      <h2>${esc(s.title)}</h2>
+      <div class="muted">${esc(s.blurb)}</div>
+      <div class="row-cta"><button class="cta" data-act="play" data-s="${f.s}">Start · first ${free === 1 ? 'scene' : free + ' scenes'} free</button><button class="cta quiet sm" data-act="series" data-s="${f.s}">Details</button></div>
+    </div></section>`;
+}
+function vFeed(){
+  const blockedCreators = S.blocked;
+  const items = FEED.map((f, i) => ({f, i})).filter(({f}) => !blockedCreators.has(f.c ? ITEMS[f.c].creator : SERIES[f.s].creator));
+  return `<div class="feedbar"><b>Clitriot</b><button class="chip-wallet" data-act="go" data-to="wallet" aria-label="Wallet balance"><i></i>${fmt(balance())}</button></div>
+    ${items.map(({f, i}) => feedCard(f, i)).join('')}`;
+}
+function vWallet(){
+  const lots = S.lots;
+  return `<div class="pad">
+    <div class="h-screen"><h1>Wallet</h1></div>
+    <div class="panel">
+      <span class="section-label">Balance</span>
+      <div class="big">${fmt(balance())}</div>
+      <div class="muted small">Unlocks come out of this balance instantly. Your card is only charged when you add funds.</div>
+      <button class="cta" data-act="topup">Add funds</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span class="section-label">Deposits</span>
+      ${lots.length ? `<div class="list">${lots.map(l => `<div class="li"><div class="grow"><div class="t">${l.id} · ${l.method}</div><div class="s">${dstr(l.when)} · ${fmt(l.rem)} of ${fmt(l.amt)} left</div><div class="lotbar"><i style="width:${l.rem / l.amt * 100}%"></i></div></div><span class="amt">${fmt(l.amt)}</span></div>`).join('')}</div>
+      <div class="fine">Purchases use your oldest deposit first.</div>`
+      : `<div class="empty"><b>No deposits yet</b><span>Your first deposit can be as small as $4.99.</span></div>`}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span class="section-label">Activity</span>
+      ${S.ledger.length ? `<div class="list">${S.ledger.map(r => `<div class="li"><div class="grow"><div class="t">${esc(r.label)}</div><div class="s">${r.kind}${r.creator ? ' · ' + CREATORS[r.creator].name : ''} · ${dstr(r.when)} ${tstr(r.when)}</div>${r.draws.length ? `<div class="draws">from ${r.draws.join(', ')}</div>` : ''}</div><span class="amt ${r.amt > 0 ? 'pos' : 'neg'}">${r.amt > 0 ? '+' : ''}${fmt(r.amt)}</span></div>`).join('')}</div>`
+      : `<div class="empty"><span>Nothing yet. Unlocks and deposits show up here.</span></div>`}
+    </div>
+    <div class="fine">Charges appear on your statement as <span class="mono">CT DIGITAL 800-555-0142</span>. Payments are simulated in this prototype.</div>
+  </div>`;
+}
+function vInbox(){
+  const rows = Object.keys(S.threads).map(k => {
+    const msgs = S.threads[k], last = msgs[msgs.length - 1];
+    const name = k === 'support' ? 'Clitriot' : CREATORS[k].name;
+    const preview = last.ppv ? 'Sent you a paid message' : last.text;
+    const av = k === 'support' ? `<span class="av" style="background:var(--brass)"></span>` : avatar(CREATORS[k]);
+    return `<button class="li" data-act="thread" data-t="${k}" style="width:100%;text-align:left">${av}<div class="grow"><div class="t">${name}${k === 'support' ? ' <span class="pill brass">Platform</span>' : ''}${S.muted.has(k) ? ' <span class="pill info">Muted</span>' : ''}</div><div class="s" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(preview)}</div></div>${S.unread.has(k) ? '<span class="pill brass">New</span>' : ''}</button>`;
+  }).join('');
+  return `<div class="pad"><div class="h-screen"><h1>Inbox</h1></div><div class="list">${rows}</div>
+    <div class="fine">You can message a creator once you’ve supported them. Each creator sets their own minimum.</div></div>`;
+}
+function vThread(){
+  const k = S.thread, msgs = S.threads[k] || [];
+  S.unread.delete(k);
+  const name = k === 'support' ? 'Clitriot' : CREATORS[k].name;
+  const body = msgs.map(m => {
+    if (m.ppv) {
+      const it = ITEMS[m.ppv], owned = S.owned.has(m.ppv), c = CREATORS[it.creator];
+      return `<div class="ppv"><div class="vis">${viz(c.pal, m.ppv, false)}${owned ? '' : '<div class="ended" style="opacity:1"><b>Locked</b></div>'}</div><div class="body"><b>${esc(it.title)}</b>${tagsHtml(it.tags)}<div class="muted small">${it.dur} · not on her public page</div>${owned ? `<button class="cta ghost sm" disabled>Unlocked · in your library</button>` : `<button class="cta sm" data-act="unlock" data-id="${m.ppv}">Unlock <span class="mono">${fmt(it.price)}</span></button>`}</div></div>`;
+    }
+    return `<div class="bub ${m.from === 'me' ? 'me' : ''}">${esc(m.text)}<span class="when">${tstr(m.when)}</span></div>`;
+  }).join('');
+  let foot;
+  if (k === 'support') foot = `<div class="gate"><span class="small muted">Replies are off for platform notices. For billing help, write to <span class="mono">billing@clitriot.com</span>.</span></div>`;
+  else {
+    const cfg = S.creatorCfg[k], spent = S.spent[k] || 0;
+    if (cfg.off) foot = `<div class="gate"><b>${name} isn’t taking new messages right now.</b></div>`;
+    else if (spent < cfg.min) foot = `<div class="gate"><b>Messages open at ${fmt(cfg.min)} spent with ${name}</b><div class="meter"><i style="width:${Math.min(100, spent / cfg.min * 100)}%"></i></div><span class="small muted">You’ve spent ${fmt(spent)} with her so far.</span></div>`;
+    else foot = `<form class="composer" data-form="send"><input id="msg-input" name="m" autocomplete="off" placeholder="Message ${name}" maxlength="500"><button class="cta sm" type="submit">Send</button></form>`;
+  }
+  return {body:`<div class="pad" style="padding-bottom:0;gap:0"><div class="h-screen"><button class="back" data-act="go" data-to="inbox">← Inbox</button>${k !== 'support' ? `<button class="back" data-act="profile" data-c="${k}">View profile</button>` : ''}</div></div>
+    <div class="thread">${body}</div>`, foot};
+}
+function vYou(){
+  const owned = [...S.owned].map(id => ITEMS[id]);
+  const pals = [['#3a1824','#8c3a4f','#c9875d'],['#14202a','#2f5866','#b7774f'],['#221a2e','#6a4e8c','#d7a6a0'],['#24180c','#8a6131','#d9b27a']];
+  return `<div class="pad">
+    <div class="h-screen"><h1>You</h1></div>
+    <div class="panel" style="flex-direction:row;align-items:center;gap:14px"><span class="av lg" style="background:radial-gradient(circle at 30% 30%,${pals[S.avatar][2]},${pals[S.avatar][1]} 55%,${pals[S.avatar][0]})"></span><div><div style="font-weight:700;font-size:17px">${S.me}</div><div class="muted small">Screen name. This is all creators see.</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Avatar</span><div class="avatars">${pals.map((p, i) => `<button aria-pressed="${S.avatar === i}" aria-label="Preset avatar ${i + 1}" data-act="avatar" data-i="${i}" style="background:radial-gradient(circle at 30% 30%,${p[2]},${p[1]} 55%,${p[0]})"></button>`).join('')}</div><div class="fine">Members pick from presets. Uploading images isn’t available to members.</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Library · ${owned.length}</span>
+      ${owned.length ? `<div class="list">${owned.map(it => `<div class="li"><div class="grow"><div class="t">${esc(it.title)}</div><div class="s">${CREATORS[it.creator].name}${it.series ? ' · ' + SERIES[it.series].title : ''}</div></div><span class="pill ok">Owned</span></div>`).join('')}</div>` : `<div class="muted small">Clips you unlock stay here, even if a creator blocks you or you block them.</div>`}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Blocked and muted</span>
+      ${[...S.blocked, ...S.muted].length ? `<div class="list">${[...S.blocked].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Blocked</div></div><button class="cta quiet sm" data-act="unblock" data-c="${k}">Unblock</button></div>`).join('')}${[...S.muted].map(k => `<div class="li"><div class="grow"><div class="t">${CREATORS[k].name}</div><div class="s">Muted</div></div><button class="cta quiet sm" data-act="unmute" data-c="${k}">Unmute</button></div>`).join('')}</div>` : `<div class="muted small">No one.</div>`}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Legal and support</span>${legalLinks()}</div>
+  </div>`;
+}
+const LEGAL = {terms:'Terms of service', privacy:'Privacy policy', '2257':'18 U.S.C. 2257 statement', billing:'Billing support', report:'Report content or request removal'};
+const legalLinks = () => `<div class="legal-links">${Object.entries(LEGAL).map(([k, v]) => `<button data-act="legal" data-k="${k}">${v}</button>`).join('')}</div>`;
+function vProfile(){
+  const k = S.profile, c = CREATORS[k];
+  const clips = Object.entries(ITEMS).filter(([id, it]) => it.creator === k && !it.series && !it.unlisted);
+  const series = Object.entries(SERIES).filter(([, s]) => s.creator === k);
+  const cfg = S.creatorCfg[k], spent = S.spent[k] || 0;
+  return `<div class="pad">
+    <div class="h-screen"><button class="back" data-act="go" data-to="${S.prev === 'profile' ? 'feed' : S.prev}">← Back</button><button class="back" data-act="blocksheet" data-c="${k}" aria-label="More options">Block or mute</button></div>
+    <div class="prof-head">${avatar(c, 'lg')}<h1>${c.name}</h1><div class="muted">@${c.handle}</div><div>${esc(c.bio)}</div>
+      <div class="row-cta" style="width:100%"><button class="cta ${spent >= cfg.min && !cfg.off ? '' : 'ghost'}" data-act="msgcreator" data-c="${k}">${cfg.off ? 'Messages off' : spent >= cfg.min ? 'Message' : 'Messages open at ' + fmt(cfg.min) + ' spent'}</button></div>
+    </div>
+    ${series.length ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Series</span>${series.map(([sid, s]) => `<button class="panel" style="text-align:left" data-act="series" data-s="${sid}"><span class="series-badge" style="align-self:flex-start">${s.mode === 'branching' ? 'Choose your path' : 'Watch in order'}</span><b style="font-family:var(--display);font-style:italic;font-size:22px;font-weight:500">${s.title}</b><span class="muted small">${s.blurb}</span></button>`).join('')}</div>` : ''}
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Clips</span>
+    <div class="grid">${clips.map(([id, it]) => `<button class="tile" data-act="${S.owned.has(id) ? 'noop' : 'unlock'}" data-id="${id}">${viz(c.pal, id, false)}<span class="pr">${S.owned.has(id) ? 'Owned' : fmt(it.price)}</span><span class="lbl">${esc(it.title)}</span></button>`).join('')}</div></div>
+  </div>`;
+}
+
+/* ---------- player ---------- */
+function playerHtml(){
+  const P = S.player, s = SERIES[P.sid], n = s.nodes[P.node], c = CREATORS[s.creator];
+  const trail = P.trail.map((k, i) => `<span class="${i === P.trail.length - 1 ? 'cur' : ''}">${s.nodes[k].title}</span>`).join('<i></i>');
+  let ctrl = '';
+  if (P.choosing) {
+    ctrl = `<div class="choice"><span class="eyebrow">Your choice</span><h3>Which door?</h3>
+      ${n.doors.map((d, i) => { const id = P.sid + ':' + d.to, owned = S.owned.has(id), price = ITEMS[id].price; const title = d.reveal === 'LABELED' ? d.label : '???';
+        return `<button class="door" data-act="door" data-i="${i}"><div class="dh"><span class="dn">Door ${i + 1}${d.reveal === 'BLIND' ? ' · blind' : ''}</span>${owned ? '<span class="own">Owned · free</span>' : `<span class="mono">${fmt(price)}</span>`}</div><span class="dt">${title}</span>${tagsHtml(d.tags)}</button>`; }).join('')}
+      <div class="fine">Every door shows what kind of scene it is. Blind doors hide the scene, never the category, and can be refunded on request.</div></div>`;
+  } else {
+    const next = n.next ? s.nodes[n.next] : null;
+    let action;
+    if (n.ending) action = `<div class="muted small">${n.cont ? 'That’s every night released so far. Night six arrives Friday.' : 'You reached an ending. Other doors lead somewhere else, and scenes you own replay free.'}</div><div class="row-cta"><button class="cta" data-act="restart">Start over</button><button class="cta quiet" data-act="closeplayer">Back to feed</button></div>`;
+    else if (n.doors) action = `<button class="cta" data-act="choose">Choose a door</button>`;
+    else { const nid = P.sid + ':' + n.next, owned = S.owned.has(nid) || !next.price; action = `<button class="cta" data-act="next">${owned ? 'Continue to ' + next.title : `Unlock ${next.title} <span class="mono">${fmt(next.price)}</span>`}</button>`; }
+    ctrl = `<div class="pctrl"><span class="series-badge" style="align-self:flex-start">${s.title}</span><h2>${n.title}</h2>${tagsHtml(n.tags)}${action}</div>`;
+  }
+  return `<div class="player${lastPlayer ? '' : ' anim'}"><div class="stagev">${viz(c.pal, P.sid + P.node)}<div class="shade" style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(14,9,12,.6),transparent 25%)"></div>
+    <div class="top"><div class="trail">${trail}</div><button class="close" data-act="closeplayer" aria-label="Close">×</button></div>
+    ${P.choosing ? ctrl : ''}</div>${P.choosing ? '' : ctrl}</div>`;
+}
+function playNode(sid, key){
+  const id = sid + ':' + key, it = ITEMS[id];
+  const go2 = () => { S.player = S.player && S.player.sid === sid ? S.player : {sid, trail:[]}; S.player.node = key; S.player.trail.push(key); S.player.choosing = false; render(); };
+  if (it.price && !S.owned.has(id)) unlockItem(id, go2); else go2();
+}
+
+/* ---------- sheets ---------- */
+function sheetHtml(){
+  const sh = S.sheet; if (!sh) return '';
+  let inner = '';
+  if (sh.type === 'topup') {
+    const need = sh.need;
+    const opts = [...(S.firstDeposit ? [{v:499, l:'Starter · first deposit only'}] : []), {v:1000, l:''}, {v:2000, l:'Most chosen'}, {v:5000, l:''}];
+    if (need > 5000) opts.push({v:Math.ceil(need / 500) * 500, l:'Covers this purchase'});
+    if (sh.sel == null) sh.sel = (opts.find(o => o.v >= need) || opts[opts.length - 1]).v;
+    inner = `<h2>Add funds</h2>${sh.title ? `<div class="muted">${esc(sh.title)} needs ${fmt(need)} more than your balance.</div>` : '<div class="muted">Your card is charged once. Unlocks after that are instant.</div>'}
+      <div class="opts">${opts.map(o => `<button class="opt" aria-pressed="${sh.sel === o.v}" data-act="pick" data-v="${o.v}" ${o.v < need ? 'disabled' : ''}><span class="v">${fmt(o.v)}</span><span class="l">${o.v < need ? 'Too small for this' : o.l || '&nbsp;'}</span></button>`).join('')}</div>
+      <div class="kv"><span>Card</span><span>Visa ending 4242</span></div>
+      <div class="kv"><span>Shows on statement as</span><span>CT DIGITAL</span></div>
+      <button class="cta" data-act="deposit" ${sh.busy ? 'disabled' : ''}>${sh.busy ? 'Processing…' : 'Pay ' + fmt(sh.sel)}</button>
+      <div class="fine">Simulated payment. In production this goes to the high-risk gateway; ${sh.title ? 'your unlock completes automatically once funds clear.' : 'funds are available immediately.'}</div>`;
+  }
+  if (sh.type === 'confirm') {
+    const p = sh.p;
+    inner = `<h2>Confirm a ${fmt(p.price)} unlock</h2><div class="muted">Purchases of $20 or more get a second tap so nothing large happens by accident.</div>
+      <div class="kv"><span>${esc(p.title)}</span><span>${fmt(p.price)}</span></div><div class="kv"><span>Wallet after</span><span>${fmt(balance() - p.price)}</span></div>
+      <div class="row-cta"><button class="cta" data-act="confirmbuy">Unlock for ${fmt(p.price)}</button><button class="cta quiet sm" data-act="closesheet">Cancel</button></div>`;
+  }
+  if (sh.type === 'series') {
+    const s = SERIES[sh.id], c = CREATORS[s.creator], keys = Object.keys(s.nodes), ids = keys.map(k => sh.id + ':' + k);
+    const ownedPaid = ids.filter(id => ITEMS[id].price && S.owned.has(id)).length, paid = ids.filter(id => ITEMS[id].price).length;
+    const sum = ids.reduce((a, id) => a + ITEMS[id].price, 0), bp = bundlePrice(sh.id);
+    inner = `<span class="series-badge" style="align-self:flex-start">${s.mode === 'branching' ? 'Branching series' : 'Linear series'} · ${c.name}</span><h2>${s.title}</h2><div class="muted">${s.blurb}</div>
+      <div class="list">${s.mode === 'linear' ? keys.map(k => { const n = s.nodes[k], id = sh.id + ':' + k; return `<div class="li"><div class="grow"><div class="t">${n.title}</div><div class="s">${n.dur}</div></div>${!n.price ? '<span class="pill info">Free</span>' : S.owned.has(id) ? '<span class="pill ok">Owned</span>' : `<span class="amt">${fmt(n.price)}</span>`}</div>`; }).join('')
+        : `<div class="li"><div class="grow"><div class="t">Free to start</div><div class="s">${keys.filter(k => !s.nodes[k].price).map(k => s.nodes[k].title).join(', ')}</div></div><span class="pill info">Free</span></div><div class="li"><div class="grow"><div class="t">Scenes behind doors</div><div class="s">${ownedPaid ? ownedPaid + ' owned so far' : 'Each scene $0.99, paid when you open its door'}</div></div><span class="amt">${fmt(99)} each</span></div>`}</div>
+      ${ownedPaid === paid ? `<button class="cta ghost" disabled>You own every scene available now</button>` : `<div class="panel"><div class="kv"><span><b>Bundle: all ${keys.length} scenes available now</b></span><span>${fmt(bp)}</span></div><div class="fine">Bought one at a time: ${fmt(sum)}. Scenes the creator adds later are sold separately.</div><button class="cta" data-act="bundle" data-s="${sh.id}">Unlock bundle <span class="mono">${fmt(bp)}</span></button></div>`}
+      <button class="cta quiet" data-act="play" data-s="${sh.id}">Start watching</button>`;
+  }
+  if (sh.type === 'block') {
+    const c = CREATORS[sh.c];
+    inner = `<h2>Block ${c.name}?</h2><ul><li>She won’t be told.</li><li>Her messages stop reaching you and her posts leave your feed.</li><li>You keep everything you’ve bought from her. Blocking doesn’t refund purchases.</li></ul>
+      <div class="muted small">Prefer something quieter? Muting keeps her messages but turns off their notifications.</div>
+      <div class="row-cta"><button class="cta" data-act="doblock" data-c="${sh.c}">Block</button><button class="cta quiet" data-act="domute" data-c="${sh.c}">Mute instead</button></div>`;
+  }
+  if (sh.type === 'legal') {
+    inner = `<h2>${LEGAL[sh.k]}</h2><div class="muted">Placeholder. Final text comes from counsel. The route exists so the merchant underwriter can see every required page from the age gate and the footer.</div>${sh.k === 'report' ? '<div class="fine">Removal requests are acknowledged immediately and decided within 48 hours, as the TAKE IT DOWN Act requires.</div>' : ''}`;
+  }
+  if (sh.type === 'info') inner = `<h2>${sh.title}</h2><div class="muted">${sh.text}</div>`;
+  return `<div class="scrim${sh !== lastSheet ? ' anim' : ''}" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${inner}</div></div>`;
+}
+
+/* ---------- creator screens ---------- */
+function cEarnings(){
+  const mine = S.sales.filter(s => s.creator === 'velvet').map(s => ({...s, earn:Math.round(s.price * s.bps / 10000), rel:new Date(s.when.getTime() + 7 * 864e5)}));
+  const avail = mine.filter(s => s.rel <= TODAY).reduce((a, s) => a + s.earn, 0) - S.paidOut.velvet.amt;
+  const pend = mine.filter(s => s.rel > TODAY).reduce((a, s) => a + s.earn, 0);
+  const ov = resolveSplit('velvet', 'Unlock');
+  return `<div class="pad">
+    <div class="h-screen"><h1>Earnings</h1><span class="pill brass">Trusted</span></div>
+    <div class="kpis"><div class="kpi"><span class="l">Available</span><span class="v">${fmt(Math.max(0, avail))}</span></div><div class="kpi"><span class="l">In 7-day hold</span><span class="v">${fmt(pend)}</span></div><div class="kpi"><span class="l">Next payout</span><span class="v" style="font-size:16px">Wed, Nov 4</span></div><div class="kpi"><span class="l">Last payout</span><span class="v" style="font-size:16px">${fmt(S.paidOut.velvet.amt)} · ${S.paidOut.velvet.when}</span></div></div>
+    <div class="panel"><span class="section-label">Your rates</span><div class="kv"><span>Unlocks</span><span>${pct(ov.bps)} · #${ov.id}</span></div><div class="kv"><span>Bundles, paid messages, tips</span><span>${pct(resolveSplit('velvet', 'Bundle').bps)}</span></div><div class="fine">Your unlock rate went to 85% on Oct 20 (agreed Oct 13). Each sale below keeps the rate it was sold at.</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Sales</span>
+    <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Fan</th><th>Item</th><th class="n">Price</th><th class="n">Rate</th><th class="n">You</th><th>Clears</th></tr></thead><tbody>
+    ${mine.map(s => `<tr class="${s.fresh ? 'new' : ''}"><td class="mono">${dstr(s.when)}</td><td>${esc(s.who)}</td><td>${esc(s.item)}<div class="faint small">${s.type}</div></td><td class="n">${fmt(s.price)}</td><td class="n">${pct(s.bps)}<div class="faint small">#${s.cfg}</div></td><td class="n">${fmt(s.earn)}</td><td class="mono">${s.rel <= TODAY ? '<span class="pill ok">Cleared</span>' : dstr(s.rel)}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="fine">Fans appear by screen name only. Payouts go weekly by ACH through the payroll service; the payout statement is frozen when it’s issued.</div></div>
+  </div>`;
+}
+function cSeries(){
+  const bars = (rows) => rows.map(([l, v, n]) => `<div class="bar"><div class="bt"><span>${l}</span><span class="mono">${v}%${n ? ' · ' + n : ''}</span></div><div class="track"><i style="width:${v}%"></i></div></div>`).join('');
+  return `<div class="pad">
+    <div class="h-screen"><h1>Series</h1><button class="cta sm" data-act="info" data-title="Add a scene" data-text="Creators upload finished vertical clips and link them as the next scene or behind a door. Uploads aren’t part of this prototype.">Add a scene</button></div>
+    <div class="panel"><span class="series-badge" style="align-self:flex-start">The Hotel Key · branching · 8 scenes</span>
+      <div class="kpis"><div class="kpi"><span class="l">Started</span><span class="v">1,284</span></div><div class="kpi"><span class="l">Opened a door</span><span class="v">412</span></div><div class="kpi"><span class="l">Revenue to date</span><span class="v">$1,906</span></div><div class="kpi"><span class="l">Scenes per buyer</span><span class="v">3.4</span></div></div></div>
+    <div class="panel"><span class="section-label">The elevator · which door</span>${bars([['Door 1 · The bath', 46, '190 viewers'], ['Door 2 · The balcony', 31, '128 viewers'], ['Door 3 · Room 1412 (blind)', 23, '94 viewers']])}<div class="fine">Door counts are totals across all viewers and appear once 5 or more people have chosen.</div></div>
+    <div class="panel"><span class="section-label">Where viewers stop</span>${bars([['Check-in', 100, '1,284'], ['The elevator', 71, '912'], ['Opened a door', 32, '412'], ['Reached an ending', 24, '308'], ['Replayed another path', 11, '141']])}</div>
+    <div class="panel"><span class="section-label">Publish checks</span>
+      <div class="check" style="padding-top:0"><span class="mk ok">✓</span><div>Every scene can be reached from Check-in</div></div>
+      <div class="check"><span class="mk ok">✓</span><div>Every path ends at an ending, with no dead ends or loops</div></div>
+      <div class="check"><span class="mk ok">✓</span><div>All 8 clips passed review: ID, 2257 record, face match, solo only</div></div>
+      <div class="check" style="border:0;padding-bottom:0"><span class="mk warn">!</span><div>Door 3 is blind. Its tags still show, and buyers can ask for a refund.</div></div></div>
+  </div>`;
+}
+function cCompliance(){
+  return `<div class="pad">
+    <div class="h-screen"><h1>Compliance</h1><span class="pill ok">Ready to publish</span></div>
+    <div class="muted">Everything you need before you film. If something lapses, you’ll see it here before an upload is ever rejected.</div>
+    <div class="panel" style="gap:0">
+      <div class="check" style="padding-top:0"><span class="mk ok">✓</span><div><b>Identity verified</b><div class="muted small">Passport, expires Mar 2034. Reminders go out 90, 60, 30 and 14 days before.</div></div></div>
+      <div class="check"><span class="mk ok">✓</span><div><b>2257 records signed</b><div class="muted small">Held by the custodian of records. Never shown to fans.</div></div></div>
+      <div class="check"><span class="mk ok">✓</span><div><b>Face enrolled</b><div class="muted small">Each upload is matched to you. Solo content only: one performer, always you.</div></div></div>
+      <div class="check" style="border:0;padding-bottom:0"><span class="mk ok">✓</span><div><b>Tax form on file</b><div class="muted small">W-9. Needed for payouts, not for publishing.</div></div></div>
+    </div>
+    <div class="panel"><span class="section-label">Legacy footage</span><div class="small">Re-edited older footage needs a production date. You must have been 21 or older when it was shot.</div></div>
+    <div class="panel"><span class="section-label">What fans can see</span><div class="small">Your stage name, your bio and your content. Never your legal name, ID, location or payout details. Files are renamed and their metadata stripped before anyone can view them.</div></div>
+  </div>`;
+}
+function cSettings(){
+  const cfg = S.creatorCfg.velvet;
+  return `<div class="pad">
+    <div class="h-screen"><h1>Settings</h1></div>
+    <div class="panel"><span class="section-label">Who can message you</span>
+      <div class="kv" style="align-items:center"><span>Turn off new messages</span><button class="toggle" role="switch" aria-checked="${cfg.off}" aria-label="Turn off new messages" data-act="msgoff"></button></div>
+      <label for="minspend" class="kv"><span>Minimum a fan has spent with you</span><span>${fmt(cfg.min)}</span></label>
+      <input type="range" id="minspend" min="99" max="10000" step="1" value="${cfg.min}" data-act="minspend" ${cfg.off ? 'disabled' : ''}>
+      <div class="fine">Between $0.99 and $100. Fans below this can’t message you at all. You can always message fans who’ve bought from you. Switch to Viewer to see the effect.</div></div>
+    <div class="panel"><span class="section-label">Blocked fans</span>${S.creatorBlocks.map(b => `<div class="kv"><span>${b.who}</span><span>since ${b.when}</span></div>`).join('')}<div class="fine">Blocked fans aren’t told. Their messages look sent on their side and never reach you. They keep what they already bought.</div></div>
+    <div class="panel"><span class="section-label">Hide from regions</span><div class="small muted">Hide your content and profile from places you choose, such as your hometown. Planned for version 2.</div></div>
+  </div>`;
+}
+
+/* ---------- admin screens ---------- */
+function aSplits(){
+  const products = ['Unlock', 'Bundle', 'PPV message', 'Tip'];
+  if (!S.draft) S.draft = Object.fromEntries(products.map(p => [p, resolveSplit('__none', p).bps]));
+  const changed = products.filter(p => S.draft[p] !== resolveSplit('__none', p).bps);
+  const recent = S.sales.slice(0, 6);
+  return `<div class="pad">
+    <div class="h-screen"><h1>Splits</h1></div>
+    <div class="panel"><span class="section-label">Platform default · creator share</span>
+      ${products.map(p => `<div class="kv" style="align-items:center"><span>${p}</span><div class="stepper"><button data-act="step" data-p="${p}" data-d="-100" aria-label="Lower ${p} share">−</button><span class="v">${pct(S.draft[p])}</span><button data-act="step" data-p="${p}" data-d="100" aria-label="Raise ${p} share">+</button></div></div>`).join('')}
+      <button class="cta" data-act="savesplit" ${changed.length ? '' : 'disabled'}>${changed.length ? 'Save ' + changed.length + ' change' + (changed.length > 1 ? 's' : '') : 'No changes'}</button>
+      <div class="fine">Raises apply right away. Cuts start after 30 days’ notice to creators, and a cut of 5 points or more also needs a second approver.</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Rate history</span>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Applies to</th><th>Product</th><th class="n">Share</th><th>From</th><th>Status</th></tr></thead><tbody>
+      ${[...S.cfg].reverse().map(r => `<tr><td class="mono">${r.id}</td><td>${r.scope === 'global' ? 'Everyone' : CREATORS[r.creator].name}<div class="faint small">${esc(r.reason)}</div></td><td>${r.product}</td><td class="n">${pct(r.bps)}</td><td class="mono">${dstr(r.eff)}</td><td>${r.status === 'active' ? (r.eff <= TODAY ? '<span class="pill ok">Live</span>' : '<span class="pill warn">Scheduled</span>') : r.status === 'approval' ? '<span class="pill warn">Needs 2nd approver</span>' : '<span class="pill info">Replaced</span>'}</td></tr>`).join('')}
+      </tbody></table></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Latest sales, all creators</span>
+      <div class="tbl-wrap"><table><thead><tr><th>Creator</th><th>Item</th><th class="n">Price</th><th class="n">Rate</th></tr></thead><tbody>
+      ${recent.map(s => `<tr class="${s.fresh ? 'new' : ''}"><td>${CREATORS[s.creator].name}</td><td>${esc(s.item)}</td><td class="n">${fmt(s.price)}</td><td class="n">${pct(s.bps)} <span class="faint">#${s.cfg}</span></td></tr>`).join('')}
+      </tbody></table></div><div class="fine">Every sale stores its rate and the rate row that produced it, so changing a rate never rewrites past statements.</div></div>
+  </div>`;
+}
+function aPricing(){
+  const tiers = [['New', '$4.99', '—'], ['Established', '$19.99', '30 days, 50 sales, clean chargebacks'], ['Trusted', '$49.99', '90 days, 250 sales'], ['Premium', '$100.00', '180 days, 500 sales, manual grant']];
+  return `<div class="pad">
+    <div class="h-screen"><h1>Pricing</h1></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Price ceilings by tier</span>
+    <div class="tbl-wrap"><table><thead><tr><th>Tier</th><th class="n">Max per scene</th><th>Earned by</th></tr></thead><tbody>${tiers.map(t => `<tr><td><b>${t[0]}</b></td><td class="n">${t[1]}</td><td class="muted">${t[2]}</td></tr>`).join('')}</tbody></table></div>
+    <div class="fine">Admins can grant any tier at onboarding for recruited creators. $100 is a hard limit that only a database migration can raise; a $200 test runs as an expiring override on named creators.</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="section-label">Creators</span><div class="list">${Object.entries(CREATORS).map(([k, c]) => `<div class="li">${avatar(c)}<div class="grow"><div class="t">${c.name}</div><div class="s">${k === 'velvet' ? '85% on unlocks · recruited' : '80% default'}</div></div><span class="pill ${c.tier === 'Premium' ? 'brass' : c.tier === 'New' ? 'info' : 'ok'}">${c.tier}</span></div>`).join('')}</div></div>
+    <div class="panel"><span class="section-label">Bundles and price changes</span><div class="small">Bundles must cost at least 20% less than buying each scene. A price rise shows to fans with notice before it applies.</div></div>
+  </div>`;
+}
+function aRegions(){
+  const lab = {OPEN:['ok', 'Open'], VERIFY:['warn', 'Age check'], BLOCK:['bad', 'Blocked'], PENDING_COUNSEL:['bad', 'Pending counsel · blocked']};
+  return `<div class="pad">
+    <div class="h-screen"><h1>Regions</h1></div>
+    <div class="muted">Where a visitor’s location has no decision from counsel, the site stays closed. Pick a row to browse the viewer app from there.</div>
+    <div>${JURIS.map(j => `<button class="radio-row" role="radio" aria-checked="${S.region === j.code}" data-act="region" data-code="${j.code}"><span class="dot"></span><span style="flex:1"><b>${j.name}</b> <span class="faint mono small">${j.code}</span></span><span class="pill ${lab[j.status][0]}">${lab[j.status][1]}</span></button>`).join('')}</div>
+    <div class="fine">Sample rows for the demo. Real statuses come from counsel.</div>
+  </div>`;
+}
+
+/* ---------- gates ---------- */
+function gateHtml(){
+  if (S.role !== 'viewer') return '';
+  const j = JURIS.find(x => x.code === S.region);
+  const bg = viz(CREATORS.velvet.pal, 'gate', false);
+  if (j.status === 'BLOCK' || j.status === 'PENDING_COUNSEL') return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">${j.name}</span><h1>Not available where you are</h1><div class="muted">Clitriot isn’t offered in your region right now.</div>${legalLinks()}<div class="fine">Demo: change the simulated region in Admin → Regions.</div></div></div>`;
+  if (!S.ageOk) return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">Adults only</span><h1>Clitriot</h1><div>This site contains sexually explicit material. Enter only if you are 18 or older, or the age of majority where you live, and it’s legal for you to view it.</div>
+    <div class="row-cta"><button class="cta" data-act="enter">I’m 18 or older, enter</button><button class="cta quiet sm" data-act="info" data-title="You’ve left" data-text="In production this sends visitors to a neutral page.">Leave</button></div>${legalLinks()}</div></div>`;
+  if (j.status === 'VERIFY' && !S.avOk) return `<div class="gatescreen">${bg}<div class="inner"><span class="eyebrow">${j.name} · age check</span><h1>Confirm your age</h1><div class="muted">Local law asks us to verify your age before you browse. A verification provider checks it; we only keep a pass token, never your documents.</div><button class="cta" data-act="av">Verify with provider (simulated)</button>${legalLinks()}</div></div>`;
+  return '';
+}
+
+/* ---------- render ---------- */
+const NAV = {viewer:[['feed','Feed'],['wallet','Wallet'],['inbox','Inbox'],['you','You']], creator:[['earnings','Earnings'],['series','Series'],['compliance','Compliance'],['settings','Settings']], admin:[['splits','Splits'],['pricing','Pricing'],['regions','Regions']]};
+let io, lastSheet = null, lastPlayer = false;
+function render(resetScroll){
+  const app = document.getElementById('app');
+  const oldScreen = app.querySelector('.screen'); const keep = !resetScroll && oldScreen ? oldScreen.scrollTop : 0;
+  const v = S.role, sc = S.screen;
+  let body = '', foot = '', cls = '';
+  if (v === 'viewer') {
+    if (sc === 'feed') { body = vFeed(); cls = 'feed'; }
+    else if (sc === 'wallet') body = vWallet();
+    else if (sc === 'inbox') body = vInbox();
+    else if (sc === 'thread') { const t = vThread(); body = t.body; foot = t.foot; }
+    else if (sc === 'you') body = vYou();
+    else if (sc === 'profile') body = vProfile();
+  } else if (v === 'creator') body = {earnings:cEarnings, series:cSeries, compliance:cCompliance, settings:cSettings}[sc]();
+  else body = {splits:aSplits, pricing:aPricing, regions:aRegions}[sc]();
+  const navKey = sc === 'thread' ? 'inbox' : sc === 'profile' ? S.prev : sc;
+  const nav = NAV[v].map(([k, l]) => `<button data-act="go" data-to="${k}" ${navKey === k ? 'aria-current="page"' : ''}>${k === 'inbox' && S.unread.size ? '<span class="badge"></span>' : ''}${l}</button>`).join('');
+  app.innerHTML = `<div class="screen ${cls}">${body}</div>${foot}<nav class="nav">${nav}</nav>${S.player && v === 'viewer' ? playerHtml() : ''}${sheetHtml()}${gateHtml()}${S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ''}`;
+  lastSheet = S.sheet; lastPlayer = !!(S.player && v === 'viewer');
+  const scr = app.querySelector('.screen'); scr.scrollTop = keep;
+  if (cls === 'feed') observeFeed(scr);
+  if (sc === 'thread') { const t = app.querySelector('.screen'); t.scrollTop = t.scrollHeight; }
+  renderNotes();
+}
+function observeFeed(root){
+  io && io.disconnect();
+  io = new IntersectionObserver(es => es.forEach(e => {
+    const c = e.target;
+    if (e.isIntersecting && e.intersectionRatio > .6) { c.classList.add('live'); }
+    else { c.classList.remove('live', 'ended-on'); }
+  }), {root, threshold:[0, .6, 1]});
+  root.querySelectorAll('.card').forEach(c => { io.observe(c); c.querySelector('.prog i').addEventListener('animationend', () => { if (c.dataset.owned !== 'true') c.classList.add('ended-on'); }); });
+}
+
+/* ---------- notes ---------- */
+const NOTES = {
+  'viewer:feed':['The feed', ['Full-screen vertical clips, one per swipe. Every locked clip plays a 6-second free preview, then softens and shows the price.', 'Series sit in the same feed. Branching series start free and put the paywall on the first door.', 'The wallet balance sits top right. There are no countdowns, streaks or fake scarcity: desire, not compulsion.'], 'Tap Unlock on any clip. You start with an empty wallet, so you’ll see the first-deposit flow, then the unlock completes on its own.'],
+  'viewer:wallet':['Prepaid wallet', ['One card charge funds many $0.99 unlocks, so processor minimums never touch a single clip.', 'Each deposit is a lot. Unlocks draw from the oldest lot first, and each activity row shows which lot paid. That lineage is what lets a chargeback be traced to the right creators.', 'Discreet billing descriptor shown before payment.'], 'Unlock a few clips, then come back and watch the lot bar drain.'],
+  'viewer:inbox':['Messages', ['Creator and fan only. Creators can’t message creators; fans can’t message fans.', 'A fan can’t write to a creator until they’ve spent that creator’s minimum with them. The default is $5.', 'Platform notices are one-way.', 'Fans can only send text. No media upload exists for fans anywhere.'], 'Unlock something from Velvet Hours. She’ll send a thank-you and a paid message.'],
+  'viewer:thread':['Paid messages', ['A paid message points to an unlisted clip that already passed the full publish checks. Nothing reaches a fan without review.', 'Under the creator’s minimum, the composer is replaced by progress toward it.', 'Text only for fans; there is no attach button.'], 'Unlock the paid message, then check it in Creator → Earnings as a PPV message line.'],
+  'viewer:you':['Account', ['Screen name is the only identity creators see. Double-blind both ways.', 'Avatars are presets, so fans never upload media.', 'Terms, privacy, 2257 statement, billing support and takedown routes are reachable from here, the footer and the age gate.'], 'Open a legal link to see where counsel’s copy will go.'],
+  'viewer:profile':['Creator profile', ['Stage name, bio, series and clips. No legal identity.', 'The message button shows the creator’s spend minimum honestly.', 'Block is silent and keeps purchases. Mute is the quieter option.'], 'Try Block or mute to see the confirmation and its disclosures.'],
+  'viewer:player':['Branching series', ['Linear is just a branching series where every scene has one exit.', 'Doors always show tags. Labeled shows the scene, teased hides it, blind hides it and shows fewer tags. Blind doors are refundable.', 'Scenes you own replay free, so exploring a second path only costs the new scenes.', 'No ending count is shown, because creators can add scenes later and bundles are a snapshot.'], 'Pick a door, reach an ending, then start over and pick another.'],
+  'creator:earnings':['Creator earnings', ['Each sale line stores the rate at the moment of sale and the rate row that produced it (#47, #112). A rate change never rewrites history.', 'Velvet Hours is on a recruited 85% unlock rate, shown to her in plain view.', 'Fans appear by screen name with what they bought.', '7-day hold, then weekly payouts.'], 'Make purchases as a viewer from Velvet Hours. They appear here highlighted.'],
+  'creator:series':['Path analytics', ['Which doors get opened, where viewers stop, and revenue per series. No linear platform can offer this.', 'Live publish checks: every scene reachable, no dead ends, every clip through all four gates.'], ''],
+  'creator:compliance':['Before you film', ['A standing checklist rather than a stream of rejections after upload.', 'Publishing and payouts are blocked separately. A missing tax form stops payouts, not publishing.', 'ID expiry reminders at 90, 60, 30 and 14 days. Passports are encouraged.', 'Legacy footage must show the performer was 21+ when it was shot.'], ''],
+  'creator:settings':['Creator controls', ['Messaging minimum from $0.99 to $100, or off.', 'Blocks are silent: the fan’s messages look sent and never arrive, and they keep their purchases.', 'Hometown geo-hiding is v2, separate from the platform’s legal region rules.'], 'Drag the minimum, then switch to Viewer and open Velvet Hours’ profile.'],
+  'admin:splits':['Revenue splits', ['Platform defaults per product, with per-creator overrides. All effective-dated.', 'Raises apply now. Cuts need 30 days’ notice, and 5+ point cuts need a second approver.', 'Every sale snapshots its rate, which fixes the retroactive-split accounting problem.'], 'Raise Unlock to 82% and save. Then unlock a Marlowe Kade clip as a viewer and see it here at 82%. Velvet stays at 85% because her override wins.'],
+  'admin:pricing':['Pricing tiers', ['Ceilings rise with tenure, from $4.99 up to $100. Admin can grant any tier at onboarding for recruited creators.', 'Purchases of $20 or more get a confirmation step. Try Oriel Vance’s $24.99 set.'], ''],
+  'admin:regions':['Jurisdiction routing', ['Fail-closed: anywhere without a counsel decision is blocked.', 'Age-check regions route through a verification provider and keep only a token.'], 'Pick Texas or Louisiana, then switch to Viewer.']
+};
+function renderNotes(){
+  const key = S.role === 'viewer' && S.player ? 'viewer:player' : S.role + ':' + S.screen;
+  const n = NOTES[key] || NOTES['viewer:feed'];
+  const roles = ['viewer', 'creator', 'admin'].map(r => `<button aria-pressed="${S.role === r}" data-role="${r}">${r[0].toUpperCase() + r.slice(1)}</button>`).join('');
+  document.getElementById('notes').innerHTML = `
+    <div class="brand"><b>Clitriot</b><span>Prototype · v0.1</span></div>
+    <p class="lede">A clickable model of the vertical micro-transaction platform. Money is simulated in your browser and every video is an abstract placeholder.</p>
+    <div class="roles" role="group" aria-label="View as">${roles}</div>
+    <div class="note-card"><span class="eyebrow">This screen</span><h3>${n[0]}</h3><ul>${n[1].map(x => `<li>${x}</li>`).join('')}</ul>${n[2] ? `<div class="try"><b>Try it:</b> ${n[2]}</div>` : ''}</div>
+    <div class="note-foot"><span>clitriot.com</span><button data-reset="1">Reset demo</button></div>`;
+  document.getElementById('mroles').innerHTML = `<div class="roles" role="group" aria-label="View as" style="margin-bottom:10px">${roles}</div>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-role]'); if (r) { setRole(r.dataset.role); return; }
+  if (e.target.closest('[data-reset]')) { S = freshState(); pending = null; render(true); return; }
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act, d = el.dataset;
+  if (a === 'scrim') { if (e.target === el) { S.sheet = null; pending = null; render(); } return; }
+  switch (a) {
+    case 'noop': break;
+    case 'go': go(d.to); break;
+    case 'enter': S.ageOk = true; render(); break;
+    case 'av': S.avOk = true; S.ageOk = true; render(); break;
+    case 'unlock': unlockItem(d.id); break;
+    case 'topup': pending = null; openSheet({type:'topup', need:0}); break;
+    case 'pick': S.sheet.sel = +d.v; render(); break;
+    case 'deposit': S.sheet.busy = true; render(); setTimeout(() => deposit(S.sheet.sel), 900); break;
+    case 'confirmbuy': { const p = S.sheet.p; p.confirmed = true; purchase(p); break; }
+    case 'closesheet': S.sheet = null; pending = null; render(); break;
+    case 'profile': S.player = null; if (S.screen !== 'profile') S.prev = S.screen; S.profile = d.c; S.screen = 'profile'; S.sheet = null; render(true); break;
+    case 'series': openSheet({type:'series', id:d.s}); break;
+    case 'bundle': buyBundle(d.s); break;
+    case 'play': S.sheet = null; S.player = null; playNode(d.s, SERIES[d.s].entry); break;
+    case 'next': { const P = S.player; playNode(P.sid, SERIES[P.sid].nodes[P.node].next); break; }
+    case 'choose': S.player.choosing = true; render(); break;
+    case 'door': { const P = S.player, door = SERIES[P.sid].nodes[P.node].doors[+d.i]; playNode(P.sid, door.to); break; }
+    case 'restart': { const sid = S.player.sid; S.player = null; playNode(sid, SERIES[sid].entry); break; }
+    case 'closeplayer': S.player = null; render(); break;
+    case 'thread': S.thread = d.t; go('thread'); break;
+    case 'msgcreator': {
+      const k = d.c, cfg = S.creatorCfg[k];
+      if (!cfg.off && (S.spent[k] || 0) >= cfg.min) { S.threads[k] = S.threads[k] || []; S.thread = k; go('thread'); }
+      else openSheet({type:'info', title:cfg.off ? 'Messages are off' : 'Support her first', text:cfg.off ? `${CREATORS[k].name} isn’t taking new messages right now.` : `${CREATORS[k].name} reads messages from fans who’ve spent ${fmt(cfg.min)} with her. You’ve spent ${fmt(S.spent[k] || 0)}. This keeps her inbox free of people who’ve never supported her.`});
+      break; }
+    case 'blocksheet': openSheet({type:'block', c:d.c}); break;
+    case 'doblock': S.blocked.add(d.c); S.sheet = null; showToast(`${CREATORS[d.c].name} is blocked. Your purchases are still in your library.`); go('feed'); break;
+    case 'domute': S.muted.add(d.c); S.sheet = null; showToast(`${CREATORS[d.c].name} is muted.`); render(); break;
+    case 'unblock': S.blocked.delete(d.c); render(); break;
+    case 'unmute': S.muted.delete(d.c); render(); break;
+    case 'avatar': S.avatar = +d.i; render(); break;
+    case 'legal': openSheet({type:'legal', k:d.k}); break;
+    case 'info': openSheet({type:'info', title:d.title, text:d.text}); break;
+    case 'msgoff': S.creatorCfg.velvet.off = !S.creatorCfg.velvet.off; render(); break;
+    case 'step': S.draft[d.p] = Math.max(5000, Math.min(9500, S.draft[d.p] + +d.d)); render(); break;
+    case 'savesplit': saveSplits(); break;
+    case 'region': S.region = d.code; S.avOk = false; showToast(`Viewer now browsing from ${JURIS.find(j => j.code === d.code).name}. Switch to Viewer to see it.`); render(); break;
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'minspend') { S.creatorCfg.velvet.min = Math.max(99, Math.round(+e.target.value / 50) * 50 || 99); const lab = e.target.previousElementSibling; if (lab) lab.lastElementChild.textContent = fmt(S.creatorCfg.velvet.min); }
+});
+document.addEventListener('change', e => { if (e.target.id === 'minspend') render(); });
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target; if (f.dataset.form !== 'send') return;
+  const v = f.m.value.trim(); if (!v) return;
+  S.threads[S.thread].push({from:'me', text:v, when:nowStamp()}); render();
+  const inp = document.getElementById('msg-input'); inp && inp.focus();
+});
+function saveSplits(){
+  const notes = [];
+  for (const [p, bps] of Object.entries(S.draft)) {
+    const cur = resolveSplit('__none', p); if (bps === cur.bps) continue;
+    const cut = cur.bps - bps, row = {id:S.nextCfg++, scope:'global', product:p, bps, by:'ANGIE', reason:cut > 0 ? 'Rate cut' : 'Rate raise'};
+    if (cut <= 0) { row.eff = new Date(TODAY); row.status = 'active'; cur.status = 'replaced'; notes.push(`${p} → ${pct(bps)} now`); }
+    else if (cut >= 500) { row.eff = addDays(30); row.status = 'approval'; notes.push(`${p} cut waits for a second approver`); }
+    else { row.eff = addDays(30); row.status = 'active'; notes.push(`${p} → ${pct(bps)} from ${dstr(row.eff)}`); }
+    S.cfg.push(row);
+  }
+  S.draft = null; showToast('Saved. ' + notes.join('. ') + '.'); render();
+}
+render(true);
+</script>
+
+</body>
+</html>

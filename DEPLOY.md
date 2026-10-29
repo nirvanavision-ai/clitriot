@@ -33,6 +33,16 @@ Before you switch, check Cloudflare's imported record list against Hostinger's D
 
 Hostinger's own DNS can't point the bare domain at Cloudflare Pages, which has no fixed IP address. That's why moving the nameservers is simpler than adding records at Hostinger.
 
+## Hosting on Hostinger web hosting instead
+
+1. In hPanel, open **Websites → clitriot.com → File manager** and go into `public_html`.
+2. Delete Hostinger's placeholder `default.php` or `index.php` if there is one.
+3. Upload `index.html`, `robots.txt` and `.htaccess` from the `site/` folder. (`.htaccess` is a hidden file; turn on "show hidden files" if you can't see it. `_headers` is for Cloudflare only and isn't needed here.)
+4. Open **Security → SSL** and make sure the free SSL certificate is active for clitriot.com.
+5. To keep the prototype private, open **Advanced → Password protect directories**, choose `public_html`, and set a username and password to share with investors.
+
+To update the site, upload the new `index.html` over the old one.
+
 ## If the domain should stay at your registrar's DNS
 
 Do steps 1 and 4 only. Then, at your registrar, add:

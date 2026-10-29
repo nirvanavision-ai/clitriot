@@ -1,0 +1,10 @@
+# Hostinger (LiteSpeed/Apache): force HTTPS, keep out of search, label as adult
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+  Header set Rating "RTA-5042-1996-1400-1577-RTA"
+  Header set Referrer-Policy "no-referrer"
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>

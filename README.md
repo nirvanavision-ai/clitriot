@@ -17,6 +17,8 @@ Clickable prototype of Clitriot, a mobile-first vertical video platform for the 
 | `index.html` | The whole prototype in one self-contained file (served at clitriot.com) |
 | `robots.txt`, `.htaccess`, `_headers` | Keep it out of search engines, force HTTPS, label it as adult |
 | `docs/DEPLOY.md` | How pushes to `main` auto-deploy to Hostinger |
+| `db/` | PostgreSQL schema for the wallet ledger and § 2257 records, with invariant tests (see `db/README.md`) |
+| `.claude/skills/` | Claude Code skills for ledger, compliance and high-risk payment work in this repo |
 
 ## Run locally
 
